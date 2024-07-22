@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Text Editor</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+    }
+    .editor-container {
+      margin-bottom: 20px;
+    }
+    textarea {
+      width: 100%;
+      height: 200px;
+      padding: 10px;
+      box-sizing: border-box;
+    }
+    .controls {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+    .controls select, .controls input {
+      padding: 5px;
+    }
+    .buttons {
+      display: flex;
+      gap: 10px;
+    }
+    button {
+      padding: 10px 15px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="editor-container">
+  <div class="controls">
+    <label for="font-family-selector">font family</label>
+    <select id="font-family-selector"></select>
+    <label for="font-weight-selector">font size</label>
+    <select id="font-weight-selector"></select>
+    <label>
+      <input type="checkbox" id="italic-toggle"> Italic
+    </label>
+  </div>
+  <textarea id="text-editor"></textarea>
+</div>
+<div class="buttons">
+  <button id="save-button">Save</button>
+  <button id="reset-button">Reset</button>
+</div>
+
+<script>
+  // Example gfonts.json content
+  const fontsData = {
+    "ABeeZee": {
+      "400": "https://fonts.gstatic.com/s/abeezee/v22/esDR31xSG-6AGleN2tWkkJUEGpA.woff2",
+      "400italic": "https://fonts.gstatic.com/s/abeezee/v22/esDT31xSG-6AGleN2tCUkp8DOJKuGA.woff2"
+    },
+    "Abel": {
+      "400": "https://fonts.gstatic.com/s/abel/v18/MwQ5bhbm2POE2V9BPbh5uGM.woff2"
+    },
+
+  "Abhaya Libre": {
+    "400": "https://fonts.gstatic.com/s/abhayalibre/v14/e3tmeuGtX-Co5MNzeAOqinEQfEnXgPRE4g.woff2",
+    "500": "https://fonts.gstatic.com/s/abhayalibre/v14/e3t5euGtX-Co5MNzeAOqinEYj2rCrdZJyIU9BQ.woff2",
+    "600": "https://fonts.gstatic.com/s/abhayalibre/v14/e3t5euGtX-Co5MNzeAOqinEYo23CrdZJyIU9BQ.woff2",
+    "700": "https://fonts.gstatic.com/s/abhayalibre/v14/e3t5euGtX-Co5MNzeAOqinEYx2zCrdZJyIU9BQ.woff2",
+    "800": "https://fonts.gstatic.com/s/abhayalibre/v14/e3t5euGtX-Co5MNzeAOqinEY22_CrdZJyIU9BQ.woff2"
+  },
+  "Aboreto": {
+    "400": "https://fonts.gstatic.com/s/aboreto/v2/5DCXAKLhwDDQ4N8bpKPUAk6t1Sc.woff2"
+  },
+  "Abril Fatface": {
+    "400": "https://fonts.gstatic.com/s/abrilfatface/v19/zOL64pLDlL1D99S8g8PtiKchq-dmjcDidBc.woff2"
+  },
+  "Abyssinica SIL": {
+    "400": "https://fonts.gstatic.com/s/abyssinicasil/v5/oY1H8ezOqK7iI3rK_45WKoc8J5UeDlK3AmuJ.woff2"
+  },
+  "Aclonica": {
+    "400": "https://fonts.gstatic.com/s/aclonica/v18/K2FyfZJVlfNNSEBXGY7UAo-KBSLy.woff2"
+  },
+  "Acme": {
+    "400": "https://fonts.gstatic.com/s/acme/v21/RrQfboBx-C5_XxrBbk_m3Lg.woff2"
+  },
+  "Actor": {
+    "400": "https://fonts.gstatic.com/s/actor/v17/wEOzEBbCkc5cO0ejVSkPU9IP.woff2"
+  },
+  "Adamina": {
+    "400": "https://fonts.gstatic.com/s/adamina/v21/j8_r6-DH1bjoc-dwi-3UEBt7Fns.woff2"
+  },
+  "Advent Pro": {
+    "100": "https://fonts.gstatic.com/s/adventpro/v20/V8mqoQfxVT4Dvddr_yOwrzaFxV7JtdQgFqXdUAQrGp_zgX5sWCpLQyJ_S5ApvQhKBXYC.woff2",
+    "200": "https://fonts.gstatic.com/s/adventpro/v20/V8mqoQfxVT4Dvddr_yOwrzaFxV7JtdQgFqXdUAQrGp_zgX5sWCpLwyN_S5ApvQhKBXYC.woff2",
+    "300": "https://fonts.gstatic.com/s/adventpro/v20/V8mqoQfxVT4Dvddr_yOwrzaFxV7JtdQgFqXdUAQrGp_zgX5sWCpLHSN_S5ApvQhKBXYC.woff2",
+    "400": "https://fonts.gstatic.com/s/adventpro/v20/V8mqoQfxVT4Dvddr_yOwrzaFxV7JtdQgFqXdUAQrGp_zgX5sWCpLQyN_S5ApvQhKBXYC.woff2",
+    "500": "https://fonts.gstatic.com/s/adventpro/v20/V8mqoQfxVT4Dvddr_yOwrzaFxV7JtdQgFqXdUAQrGp_zgX5sWCpLcSN_S5ApvQhKBXYC.woff2",
+    "600": "https://fonts.gstatic.com/s/adventpro/v20/V8mqoQfxVT4Dvddr_yOwrzaFxV7JtdQgFqXdUAQrGp_zgX5sWCpLnSR_S5ApvQhKBXYC.woff2",
+    "700": "https://fonts.gstatic.com/s/adventpro/v20/V8mqoQfxVT4Dvddr_yOwrzaFxV7JtdQgFqXdUAQrGp_zgX5sWCpLpCR_S5ApvQhKBXYC.woff2",
+    "800": "https://fonts.gstatic.com/s/adventpro/v20/V8mqoQfxVT4Dvddr_yOwrzaFxV7JtdQgFqXdUAQrGp_zgX5sWCpLwyR_S5ApvQhKBXYC.woff2",
+    "900": "https://fonts.gstatic.com/s/adventpro/v20/V8mqoQfxVT4Dvddr_yOwrzaFxV7JtdQgFqXdUAQrGp_zgX5sWCpL6iR_S5ApvQhKBXYC.woff2",
+    "100italic": "https://fonts.gstatic.com/s/adventpro/v20/V8mkoQfxVT4Dvddr_yOwhT-3Jr6w5kKOEbAVEvZiKGAr6BX29i1ei2CnDqArtwloAW4DgYg.woff2",
+    "200italic": "https://fonts.gstatic.com/s/adventpro/v20/V8mkoQfxVT4Dvddr_yOwhT-3Jr6w5kKOEbAVEvZiKGAr6BX29i1ei2AnD6ArtwloAW4DgYg.woff2",
+    "300italic": "https://fonts.gstatic.com/s/adventpro/v20/V8mkoQfxVT4Dvddr_yOwhT-3Jr6w5kKOEbAVEvZiKGAr6BX29i1ei2D5D6ArtwloAW4DgYg.woff2",
+    "400italic": "https://fonts.gstatic.com/s/adventpro/v20/V8mkoQfxVT4Dvddr_yOwhT-3Jr6w5kKOEbAVEvZiKGAr6BX29i1ei2CnD6ArtwloAW4DgYg.woff2",
+    "500italic": "https://fonts.gstatic.com/s/adventpro/v20/V8mkoQfxVT4Dvddr_yOwhT-3Jr6w5kKOEbAVEvZiKGAr6BX29i1ei2CVD6ArtwloAW4DgYg.woff2",
+    "600italic": "https://fonts.gstatic.com/s/adventpro/v20/V8mkoQfxVT4Dvddr_yOwhT-3Jr6w5kKOEbAVEvZiKGAr6BX29i1ei2B5CKArtwloAW4DgYg.woff2",
+    "700italic": "https://fonts.gstatic.com/s/adventpro/v20/V8mkoQfxVT4Dvddr_yOwhT-3Jr6w5kKOEbAVEvZiKGAr6BX29i1ei2BACKArtwloAW4DgYg.woff2",
+    "800italic": "https://fonts.gstatic.com/s/adventpro/v20/V8mkoQfxVT4Dvddr_yOwhT-3Jr6w5kKOEbAVEvZiKGAr6BX29i1ei2AnCKArtwloAW4DgYg.woff2",
+    "900italic": "https://fonts.gstatic.com/s/adventpro/v20/V8mkoQfxVT4Dvddr_yOwhT-3Jr6w5kKOEbAVEvZiKGAr6BX29i1ei2AOCKArtwloAW4DgYg.woff2"
+  },
+  "Bahianita": {
+    "400": "https://fonts.gstatic.com/s/bahianita/v18/yYLr0hTb3vuqqsBUgxWdwjHU-tFfcQ.woff2"
+  },
+  "Bai Jamjuree": {
+    "200": "https://fonts.gstatic.com/s/baijamjuree/v11/LDIqapSCOBt_aeQQ7ftydoa0kePelJo02SuCgQ.woff2",
+    "300": "https://fonts.gstatic.com/s/baijamjuree/v11/LDIqapSCOBt_aeQQ7ftydoa09eDelJo02SuCgQ.woff2",
+    "400": "https://fonts.gstatic.com/s/baijamjuree/v11/LDI1apSCOBt_aeQQ7ftydoa8XsLLubg58w.woff2",
+    "500": "https://fonts.gstatic.com/s/baijamjuree/v11/LDIqapSCOBt_aeQQ7ftydoa0reHelJo02SuCgQ.woff2",
+    "600": "https://fonts.gstatic.com/s/baijamjuree/v11/LDIqapSCOBt_aeQQ7ftydoa0gebelJo02SuCgQ.woff2",
+    "700": "https://fonts.gstatic.com/s/baijamjuree/v11/LDIqapSCOBt_aeQQ7ftydoa05efelJo02SuCgQ.woff2",
+    "200italic": "https://fonts.gstatic.com/s/baijamjuree/v11/LDIoapSCOBt_aeQQ7ftydoa8W_oGkqo20yygg_vb.woff2",
+    "300italic": "https://fonts.gstatic.com/s/baijamjuree/v11/LDIoapSCOBt_aeQQ7ftydoa8W_pikao20yygg_vb.woff2",
+    "400italic": "https://fonts.gstatic.com/s/baijamjuree/v11/LDIrapSCOBt_aeQQ7ftydoa8W_LJs78b8SGK.woff2",
+    "500italic": "https://fonts.gstatic.com/s/baijamjuree/v11/LDIoapSCOBt_aeQQ7ftydoa8W_o6kKo20yygg_vb.woff2",
+    "600italic": "https://fonts.gstatic.com/s/baijamjuree/v11/LDIoapSCOBt_aeQQ7ftydoa8W_oWl6o20yygg_vb.woff2",
+    "700italic": "https://fonts.gstatic.com/s/baijamjuree/v11/LDIoapSCOBt_aeQQ7ftydoa8W_pylqo20yygg_vb.woff2"
+  },
+  };
+
+  const fontFamilySelector = document.getElementById('font-family-selector');
+  const fontWeightSelector = document.getElementById('font-weight-selector');
+  const italicToggle = document.getElementById('italic-toggle');
+  const textEditor = document.getElementById('text-editor');
+  const saveButton = document.getElementById('save-button');
+  const resetButton = document.getElementById('reset-button');
+
+  function loadFonts() {
+    for (const font in fontsData) {
+      const option = document.createElement('option');
+      option.value = font;
+      option.textContent = font;
+      fontFamilySelector.appendChild(option);
+    }
+  }
+
+  function updateFontWeights() {
+    const selectedFont = fontFamilySelector.value;
+    const weights = Object.keys(fontsData[selectedFont]);
+    fontWeightSelector.innerHTML = '';
+    weights.forEach(weight => {
+      const option = document.createElement('option');
+      option.value = weight;
+      option.textContent = weight.replace('italic', ' Italic');
+      fontWeightSelector.appendChild(option);
+    });
+    updateItalicToggle();
+  }
+
+  function updateItalicToggle() {
+    const selectedFont = fontFamilySelector.value;
+    const selectedWeight = fontWeightSelector.value;
+    italicToggle.disabled = !selectedWeight.includes('italic') && !fontsData[selectedFont].hasOwnProperty(selectedWeight + 'italic');
+  }
+
+  function applyFont() {
+    const selectedFont = fontFamilySelector.value;
+    const selectedWeight = fontWeightSelector.value;
+    const isItalic = italicToggle.checked && fontsData[selectedFont].hasOwnProperty(selectedWeight + 'italic');
+    const fontUrl = fontsData[selectedFont][selectedWeight] || fontsData[selectedFont][selectedWeight + 'italic'];
+
+    const fontFace = new FontFace(selectedFont, `url(${fontUrl})`);
+    fontFace.load().then(loadedFont => {
+      document.fonts.add(loadedFont);
+      textEditor.style.fontFamily = selectedFont;
+      textEditor.style.fontWeight = selectedWeight.replace('italic', '');
+      textEditor.style.fontStyle = isItalic ? 'italic' : 'normal';
+    });
+  }
+
+  function loadSavedContent() {
+    const savedContent = localStorage.getItem('textContent');
+    const savedFontFamily = localStorage.getItem('fontFamily');
+    const savedFontWeight = localStorage.getItem('fontWeight');
+    const savedItalic = localStorage.getItem('italic');
+
+    if (savedContent) textEditor.value = savedContent;
+    if (savedFontFamily) fontFamilySelector.value = savedFontFamily;
+    if (savedFontWeight) fontWeightSelector.value = savedFontWeight;
+    if (savedItalic) italicToggle.checked = JSON.parse(savedItalic);
+
+    applyFont();
+  }
+
+  function saveContent() {
+    localStorage.setItem('textContent', textEditor.value);
+    localStorage.setItem('fontFamily', fontFamilySelector.value);
+    localStorage.setItem('fontWeight', fontWeightSelector.value);
+    localStorage.setItem('italic', italicToggle.checked);
+  }
+
+  function resetContent() {
+    textEditor.value = '';
+    fontFamilySelector.selectedIndex = 0;
+    updateFontWeights();
+    italicToggle.checked = false;
+    applyFont();
+  }
+
+  fontFamilySelector.addEventListener('change', () => {
+    updateFontWeights();
+    applyFont();
+  });
+
+  fontWeightSelector.addEventListener('change', () => {
+    updateItalicToggle();
+    applyFont();
+  });
+
+  italicToggle.addEventListener('change', applyFont);
+  textEditor.addEventListener('input', saveContent);
+  saveButton.addEventListener('click', saveContent);
+  resetButton.addEventListener('click', resetContent);
+
+  loadFonts();
+  loadSavedContent();
+</script>
+
+</body>
+</html>
